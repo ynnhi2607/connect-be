@@ -1,4 +1,4 @@
-package com.social.be;
+package com.connect.be;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

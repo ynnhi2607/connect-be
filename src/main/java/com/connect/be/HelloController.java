@@ -1,4 +1,4 @@
-package com.social.be;
+package com.connect.be;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

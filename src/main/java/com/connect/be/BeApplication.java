@@ -1,4 +1,4 @@
-package com.social.be;
+package com.connect.be;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
