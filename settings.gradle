@@ -1,0 +1,4 @@
+rootProject.name = 'connect-be'
+
+include 'api'
+include 'core'
