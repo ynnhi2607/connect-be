@@ -129,11 +129,37 @@ curl "http://localhost:8080/api/auth/me" `
 
 ## Run Tests
 
+Before building or running a new version, run the tests from the project root:
+
+Linux, WSL, Git Bash, or macOS:
+
+```bash
+./gradlew test
+```
+
+Windows PowerShell:
+
 ```powershell
 .\gradlew.bat test
 ```
 
 Tests use an in-memory H2 database, so MySQL is not required for tests.
+
+To test only one module:
+
+```bash
+./gradlew :api:test
+./gradlew :core:test
+```
+
+`./gradlew :api:test` runs the tests in `api` and compiles the modules that
+`api` depends on. It does not run the tests declared in `core`.
+
+`BeApplicationTests.contextLoads()` is a basic startup test. Although its test
+method is empty, `@SpringBootTest` creates the Spring application context and
+detects problems such as missing beans, invalid dependency injection, broken
+security configuration, and unreadable required properties. It only verifies
+that the application can start; endpoint behavior still needs dedicated tests.
 
 ## Build The Jar
 
@@ -152,6 +178,82 @@ Run the jar:
 ```powershell
 java -jar .\api\build\libs\api-0.0.1-SNAPSHOT.jar
 ```
+
+## Docker Development Workflow
+
+Use this order after changing backend code:
+
+```text
+change code -> run tests -> build image -> run container -> health check
+```
+
+Run all tests:
+
+```bash
+./gradlew test
+```
+
+When changing only the `api` module, the shorter check is:
+
+```bash
+./gradlew :api:test
+```
+
+Build the backend image from the project root:
+
+```bash
+docker build --progress=plain -t connect-backend:dev .
+```
+
+Run it temporarily against MySQL on the host machine:
+
+```bash
+docker run -d \
+  --rm \
+  --name connect-backend-test \
+  --network host \
+  --env-file .env \
+  -e SERVER_PORT=8081 \
+  connect-backend:dev
+```
+
+Spring Boot may need several seconds to start. Follow the logs and wait until
+`Started BeApplication` appears:
+
+```bash
+docker logs -f connect-backend-test
+```
+
+Press `Ctrl+C` to stop following the logs. This does not stop the container.
+
+Check the application health:
+
+```bash
+curl http://localhost:8081/actuator/health
+```
+
+Expected response:
+
+```json
+{"status":"UP"}
+```
+
+Inspect the container when something fails:
+
+```bash
+docker ps -a --filter name=connect-backend-test
+docker logs connect-backend-test
+```
+
+Stop the test container when finished:
+
+```bash
+docker stop connect-backend-test
+```
+
+The `--network host` option is only for this local, standalone image test. The
+Docker Compose setup will connect the backend to the MySQL service through the
+Compose network and the hostname `mysql`.
 
 ## Common Issues
 

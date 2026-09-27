@@ -1,0 +1,17 @@
+.git
+.github
+.gradle
+.idea
+.vscode
+
+**/build
+**/target
+
+*.iml
+
+.env
+.env.*
+!.env.example
+
+gradle.properties
+README.md
