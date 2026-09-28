@@ -1,6 +1,7 @@
 HELP.md
 .gradle/
 gradle.properties
+node_modules/
 .env
 .env.local
 target/
